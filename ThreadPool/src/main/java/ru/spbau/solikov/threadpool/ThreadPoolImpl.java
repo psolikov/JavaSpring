@@ -38,6 +38,12 @@ public class ThreadPoolImpl<T> {
         }
     }
 
+    /**
+     * Add task to be done by thread pool.
+     *
+     * @param task to be done
+     * @return LightFuture object that represents task doing on thread pool
+     */
     public LightFuture<T> addTask(Supplier<T> task) {
         Task newTask = new Task(task);
 
@@ -86,7 +92,7 @@ public class ThreadPoolImpl<T> {
         private Exception exception = null;
 
         /**
-         * Constructs light future task by given supplier task
+         * Constructs light future task by given supplier task.
          *
          * @param task task to be constructed from
          */
