@@ -51,17 +51,19 @@ public class LazyFactory {
             private T answer = null;
 
             @Override
-            public synchronized T get() {
+            public T get() {
 
                 if (triggered) {
                     return answer;
                 }
 
-                if (answer == null) {
-                    answer = supplier.get();
-
+                synchronized (this) {
                     if (answer == null) {
-                        triggered = true;
+                        answer = supplier.get();
+
+                        if (answer == null) {
+                            triggered = true;
+                        }
                     }
                 }
 
