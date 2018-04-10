@@ -89,7 +89,7 @@ public class ThreadPoolImpl<T> {
         private boolean isReady = false;
         private T answer = null;
         private Supplier<T> task;
-        private LightExecutionException exception = null;
+        private Exception exception = null;
 
         /**
          * Constructs light future task by given supplier task.
@@ -103,8 +103,9 @@ public class ThreadPoolImpl<T> {
         private synchronized void start() throws LightExecutionException {
             try {
                 answer = task.get();
-            } catch (Exception e) {
+            } catch (Exception e){
                 exception = new LightExecutionException();
+                exception.addSuppressed(e);
             }
 
             isReady = true;
@@ -118,7 +119,7 @@ public class ThreadPoolImpl<T> {
         }
 
         @Override
-        public synchronized T get() throws LightExecutionException {
+        public synchronized T get() throws Exception {
             while (!isReady) {
                 try {
                     wait();
@@ -127,7 +128,7 @@ public class ThreadPoolImpl<T> {
                 }
             }
 
-            if (exception != null) {
+            if (exception != null){
                 throw exception;
             }
 

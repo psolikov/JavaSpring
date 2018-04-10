@@ -23,7 +23,7 @@ public interface LightFuture<T> {
      * @return evaluated answer
      * @throws LightExecutionException if corresponding Supplier throws an exception
      */
-    T get() throws LightExecutionException;
+    T get() throws LightExecutionException, Exception;
 
     /**
      * Represents composition of tasks.
