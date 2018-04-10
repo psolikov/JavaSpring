@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 public class ThreadPoolImplTest {
 
     @Test
-    public void testNotReady() throws Exception {
+    public void testNotReady() {
         ThreadPoolImpl<Integer> threadPool = new ThreadPoolImpl<>(5);
 
         LightFuture task = threadPool.addTask(() -> 0);
@@ -24,7 +24,7 @@ public class ThreadPoolImplTest {
     }
 
     @Test
-    public void testIsReady() throws Exception {
+    public void testIsReady() throws LightExecutionException {
         ThreadPoolImpl<Integer> threadPool = new ThreadPoolImpl<>(5);
 
         LightFuture task = threadPool.addTask(() -> 0);
@@ -35,7 +35,7 @@ public class ThreadPoolImplTest {
     }
 
     @Test
-    public void testThenApply() throws Exception {
+    public void testThenApply() throws LightExecutionException {
         ThreadPoolImpl<Integer> threadPool = new ThreadPoolImpl<>(5);
 
         LightFuture<Integer> task = threadPool.addTask(() -> 1).thenApply(x -> x + 2)
@@ -45,7 +45,7 @@ public class ThreadPoolImplTest {
     }
 
     @Test
-    public void testAddTask() throws Exception {
+    public void testAddTask() throws LightExecutionException {
         ThreadPoolImpl<Integer> threadPool = new ThreadPoolImpl<>(10);
 
         LightFuture<Integer> task1 = threadPool.addTask(() -> (1231 * 32) / 2);
@@ -60,7 +60,7 @@ public class ThreadPoolImplTest {
     }
 
     @Test
-    public void testOneThreadManyTasks() throws Exception {
+    public void testOneThreadManyTasks() throws LightExecutionException {
         ThreadPoolImpl<Integer> threadPool = new ThreadPoolImpl<>(1);
 
         ArrayList<LightFuture<Integer>> arrayList = new ArrayList<>();
@@ -78,7 +78,7 @@ public class ThreadPoolImplTest {
     }
 
     @Test
-    public void testManyThreadsManyTasks() throws Exception {
+    public void testManyThreadsManyTasks() throws LightExecutionException {
         ThreadPoolImpl<Integer> threadPool = new ThreadPoolImpl<>(50);
 
         ArrayList<LightFuture<Integer>> arrayList = new ArrayList<>();
@@ -96,7 +96,7 @@ public class ThreadPoolImplTest {
     }
 
     @Test(expected = LightExecutionException.class)
-    public void testExceptionInGet() throws Exception {
+    public void testExceptionInGet() throws LightExecutionException {
         ThreadPoolImpl<Void> threadPool = new ThreadPoolImpl<>(5);
 
         LightFuture<Void> task = threadPool.addTask(() -> {
