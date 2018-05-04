@@ -51,18 +51,13 @@ public class FTPTest {
     }
 
     @Test
-    public void testListOnEmptyDirectory() throws IOException {
-        assertEquals(client.list("src/test/resources/EmptyDir").size(), 0);
-    }
-
-    @Test
     public void testGetOnNonExistentFile() throws IOException {
         assertEquals(client.list("src/test/resources/dqofpko").size(), 0);
     }
 
     @Test
     public void testGetOnDirectory() throws IOException {
-        assertEquals(client.list("src/test/resources/EmptyDir").size(), 0);
+        assertEquals(client.list("src/test/resources/DirWith4Files").size(), 0);
     }
 
     @Test
