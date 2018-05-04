@@ -39,10 +39,10 @@ public class FTPTest {
 
     @Test
     public void testListOnDirectory() throws IOException {
-        assertEquals(client.list("src/test/resources/DirWith4Files").size(), 4);
+        List<FTPFile> answer;
+        assertEquals((answer = client.list("src/test/resources/DirWith4Files")).size(), 4);
         String[] expected = new String[]{"1", "2", "3", "dir"};
         boolean[] expected2 = new boolean[]{false, false, false, true};
-        List<FTPFile> answer = client.list("src/test/resources/DirWith4Files");
         answer.sort(Comparator.comparing(FTPFile::getName));
         for (int i = 0; i < answer.size(); i++) {
             assertEquals(answer.get(i).isDirectory(), expected2[i]);
@@ -52,12 +52,12 @@ public class FTPTest {
 
     @Test
     public void testGetOnNonExistentFile() throws IOException {
-        assertEquals(client.list("src/test/resources/dqofpko").size(), 0);
+        assertNull(client.get("src/test/resources/dqofpko"));
     }
 
     @Test
     public void testGetOnDirectory() throws IOException {
-        assertEquals(client.list("src/test/resources/DirWith4Files").size(), 4);
+        assertNull(client.get("src/test/resources/DirWith4Files"));
     }
 
     @Test
