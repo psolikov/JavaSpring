@@ -96,6 +96,7 @@ public class FTPServer {
                 String path = dataInputStream.readUTF();
                 if (query == 1) {
                     list(path, dataOutputStream);
+                    continue;
                 }
                 get(path, dataOutputStream);
             }
