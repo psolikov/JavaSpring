@@ -7,6 +7,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+/**
+ * Implementation of command-line application that takes a class as an argument.
+ * Then runs all class' methods annotated with @Test.
+ * Every method annotated with @Before invokes before test method.
+ * Every method annotated with @After invokes after test method.
+ * Every method annotated with @BeforeClass invokes before creation of class' object.
+ * Every method annotated with @AfterClass invokes after creation of class' object.
+ *
+ * @param <T> type of class to be tested
+ */
 public class XUnit<T> {
 
     private T instance;
@@ -17,6 +27,11 @@ public class XUnit<T> {
     private ArrayList<Method> after = new ArrayList<>();
     private ArrayList<Method> afterClass = new ArrayList<>();
 
+    /**
+     * Call that method to start the application.
+     *
+     * @param args classname of class to be tested
+     */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("Please, pass only classname");
@@ -42,6 +57,17 @@ public class XUnit<T> {
         }
     }
 
+    /**
+     * Creates an instance of given class to invoke methods from it.
+     * Collects all annotated methods into ArrayLists.
+     * Runs all tests with corresponding begin/after methods.
+     *
+     * @param aClass class to be tested
+     * @throws NoSuchMethodException thrown when the class doesn't have default constructor
+     * @throws IllegalAccessException thrown when can't access a method
+     * @throws InvocationTargetException thrown when can't invoke a method
+     * @throws InstantiationException thrown when can't make an instance of provided class
+     */
     public XUnit(@NotNull Class<T> aClass) throws
             NoSuchMethodException,
             IllegalAccessException,
@@ -88,15 +114,19 @@ public class XUnit<T> {
                 try {
                     test.invoke(instance);
                     stop = System.currentTimeMillis();
-                } catch (InvocationTargetException e){
+                } catch (InvocationTargetException e) {
                     exception = e.getTargetException();
                 }
                 if (exception != null && !exception.getClass().equals(annotation.expected())) {
-                    System.out.println("failed: \"" + test.getName() + "\" " + exception + " " + annotation.expected());
+                    System.out.println("failed: \"" +
+                            test.getName() + "\" " + exception + " " + annotation.expected());
                 } else if (exception == null && !annotation.expected().equals(Object.class)) {
-                    System.out.println("failed: \"" + test.getName() + "\" expected an exception " + annotation.expected().getName());
+                    System.out.println("failed: \"" +
+                            test.getName() + "\" expected an exception " +
+                            annotation.expected().getName());
                 } else {
-                    System.out.println("finished: \"" + test.getName() + "\" in " + (stop - start) + " ms");
+                    System.out.println("finished: \"" +
+                            test.getName() + "\" in " + (stop - start) + " ms");
                 }
 
                 for (var after : after) {

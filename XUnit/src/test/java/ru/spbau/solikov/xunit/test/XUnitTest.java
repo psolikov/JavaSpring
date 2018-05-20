@@ -12,6 +12,10 @@ import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test XUnit command-line application. Takes examples from ru.spbau.solikov.xunit.test.Tests.
+ * Redirects output to ByteArrayOutputStream.
+ */
 public class XUnitTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -154,5 +158,15 @@ public class XUnitTest {
             IllegalAccessException {
         var xUnit = new XUnit<>(WrongException.class);
         assertTrue(outContent.toString().contains("failed"));
+    }
+
+    @Test
+    public void testIgnored() throws
+            InvocationTargetException,
+            NoSuchMethodException,
+            InstantiationException,
+            IllegalAccessException {
+        var xUnit = new XUnit<>(IgnoredTest.class);
+        assertTrue(outContent.toString().contains("ignored"));
     }
 }
