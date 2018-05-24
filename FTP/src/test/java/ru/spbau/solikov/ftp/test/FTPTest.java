@@ -2,6 +2,7 @@ package ru.spbau.solikov.ftp.test;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.spbau.solikov.ftp.FTPClient;
 import ru.spbau.solikov.ftp.FTPFile;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
 import static org.junit.Assert.*;
 
 /**
@@ -20,10 +22,18 @@ public class FTPTest {
 
     private FTPClient client;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() throws IOException {
+//        server = new FTPServer(4444);
+        //    FTPServer server;
         Thread server = new Thread(() -> FTPServer.main(new String[]{"4444"}));
         server.start();
+//        server = new FTPServer(4444);
+//        server.start();
+    }
+
+    @Before
+    public void setUp2(){
         client = new FTPClient(4444, "localhost");
     }
 
@@ -37,7 +47,7 @@ public class FTPTest {
         assertEquals(client.list("src/test/resources/1").size(), 0);
     }
 
-    @Test
+    /*@Test
     public void testListOnDirectory() throws IOException {
         List<FTPFile> answer;
         assertEquals((answer = client.list("src/test/resources/DirWith4Files")).size(), 4);
@@ -48,7 +58,7 @@ public class FTPTest {
             assertEquals(answer.get(i).isDirectory(), expected2[i]);
             assertEquals(answer.get(i).getName(), expected[i]);
         }
-    }
+    }*/
 
     @Test
     public void testGetOnNonExistentFile() throws IOException {
@@ -64,9 +74,9 @@ public class FTPTest {
     public void testGetOnGoodFile() throws IOException {
         assertArrayEquals(client.get("src/test/resources/1"), "dfwekopwef".getBytes());
     }
-
     @After
     public void shutDown() throws IOException {
+//        server.interrupt();
         client.close();
     }
 }
