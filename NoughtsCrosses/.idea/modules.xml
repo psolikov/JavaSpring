@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/noughtscrosses.iml" filepath="$PROJECT_DIR$/.idea/modules/noughtscrosses.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/noughtscrosses_main.iml" filepath="$PROJECT_DIR$/.idea/modules/noughtscrosses_main.iml" group="noughtscrosses" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/noughtscrosses_test.iml" filepath="$PROJECT_DIR$/.idea/modules/noughtscrosses_test.iml" group="noughtscrosses" />
+    </modules>
+  </component>
+</project>
