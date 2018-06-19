@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static java.lang.System.exit;
+
 /**
  * Class that represents server which can handle some request from
  * clients about files stored on that server.
@@ -11,6 +13,7 @@ import java.net.Socket;
 public class FTPServer {
 
     private int port;
+    private ServerSocket serverSocket;
 
     /**
      * To start the server run that method.
@@ -20,12 +23,18 @@ public class FTPServer {
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.print("Usage: java FTPServer <port number>");
-            System.exit(1);
+            exit(1);
         }
 
         int givenPort = Integer.parseInt(args[0]);
-
-        new FTPServer(givenPort);
+        System.out.println("norm");
+        try {
+            new FTPServer(givenPort);
+        } catch (IOException e) {
+            System.out.println("Can't create server");
+            e.printStackTrace();
+            exit(1);
+        }
     }
 
     /**
@@ -33,9 +42,28 @@ public class FTPServer {
      *
      * @param port to be used for incoming requests
      */
-    public FTPServer(int port) {
+    public FTPServer(int port) throws IOException {
+        this(new ServerSocket(port));
         this.port = port;
+    }
+
+    /**
+     * Creates the server's instance with given serverSocket.
+     *
+     * @param serverSocket to get connection from
+     */
+    public FTPServer(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
         start();
+    }
+
+    /**
+     * Closes the server socket.
+     *
+     * @throws IOException if can't close
+     */
+    public void close() throws IOException {
+        serverSocket.close();
     }
 
     private void list(String path, DataOutputStream dataOutputStream) {
@@ -83,25 +111,43 @@ public class FTPServer {
     }
 
     private void start() {
-        try (ServerSocket serverSocket = new ServerSocket(port);
-             Socket clientSocket = serverSocket.accept();
-             DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
-             DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-        ) {
-            int query;
+        while (true) {
+            try {
+                Socket clientSocket = serverSocket.accept();
+                Thread thread = new Thread(() -> {
+                    try (DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
+                         DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());) {
+                        int query = 0;
 
-            while (clientSocket.isConnected()) {
-                query = dataInputStream.readInt();
-                if ((query != 1) && (query != 2)) break;
-                String path = dataInputStream.readUTF();
-                if (query == 1) {
-                    list(path, dataOutputStream);
-                    continue;
-                }
-                get(path, dataOutputStream);
+                        while (clientSocket.isConnected()) {
+                            try {
+                                query = dataInputStream.readInt();
+                            } catch (IOException e) {
+                                System.out.println("Can't read. Try again.");
+                            }
+                            if ((query != Request.LIST.getID()) && (query != Request.GET.getID())) break;
+                            String path = null;
+                            try {
+                                path = dataInputStream.readUTF();
+                            } catch (IOException e) {
+                                System.out.println("Can't read. Try again.");
+                            }
+                            System.out.println("Just read : " + query + " " + path);
+                            if (query == Request.LIST.getID()) {
+                                System.out.println("LIST");
+                                list(path, dataOutputStream);
+                                continue;
+                            }
+                            get(path, dataOutputStream);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+                thread.start();
+            } catch (IOException e) {
+                return;
             }
-        } catch (IOException e) {
-            System.out.print("Can't establish connection.");
         }
     }
 }

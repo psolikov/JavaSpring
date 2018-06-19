@@ -3,8 +3,12 @@ package ru.spbau.solikov.ftp;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+
+import static java.lang.System.exit;
+import static java.lang.System.in;
 
 /**
  * A client part of FTP communication. Provides listing and downloading from the server.
@@ -16,9 +20,9 @@ public class FTPClient {
     private DataInputStream dataInputStream;
 
     /**
-     * Creates channel between server and client.
+     * Creates a channel between server and client.
      *
-     * @param port that server is using for monitoring
+     * @param port    that server is using for monitoring
      * @param address of the server
      */
     public FTPClient(int port, String address) {
@@ -28,6 +32,25 @@ public class FTPClient {
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             System.out.print("Can't establish connection. Try again.");
+            e.printStackTrace();
+            exit(1);
+        }
+    }
+
+    /**
+     * Creates a channel between server and client from given socket.
+     *
+     * @param s socket to be connected
+     */
+    public FTPClient(Socket s) {
+        socket = s;
+        try {
+            dataInputStream = new DataInputStream(socket.getInputStream());
+            dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            System.out.print("Can't establish connection. Try again.");
+            e.printStackTrace();
+            exit(1);
         }
     }
 
@@ -54,8 +77,7 @@ public class FTPClient {
      * @throws IOException if cant't write to the socket due to connection problems
      */
     public List<FTPFile> list(String path) throws IOException {
-        dataOutputStream.writeInt(1);
-        dataOutputStream.writeUTF(path);
+        writeType(Request.LIST, path);
         int size = dataInputStream.readInt();
         List<FTPFile> ftpFiles = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -76,8 +98,7 @@ public class FTPClient {
      * @throws IOException if cant't write to the socket due to connection problems
      */
     public byte[] get(String path) throws IOException {
-        dataOutputStream.writeInt(2);
-        dataOutputStream.writeUTF(path);
+        writeType(Request.GET, path);
         long size = dataInputStream.readLong();
         if (size == 0) {
             return null;
@@ -99,6 +120,19 @@ public class FTPClient {
         return output.toByteArray();
     }
 
+    private void writeType(Request request, String path) throws IOException {
+        switch (request) {
+            case LIST:
+                dataOutputStream.writeInt(1);
+                dataOutputStream.writeUTF(path);
+                break;
+            case GET:
+                dataOutputStream.writeInt(2);
+                dataOutputStream.writeUTF(path);
+                break;
+        }
+    }
+
     /**
      * To start the client run that method.
      *
@@ -107,29 +141,44 @@ public class FTPClient {
     public static void main(String[] args) throws IOException {
         if (args.length != 2) {
             System.err.println("Usage: java FTPClient <host name> <port number>");
-            System.exit(1);
+            exit(1);
         }
         String hostName = args[0];
         int portNumber = Integer.parseInt(args[1]);
 
         FTPClient ftpClient = new FTPClient(portNumber, hostName);
-        Scanner sc = new Scanner(System.in);
 
-        while (true){
-            System.out.println("To list files type <1: Int> <path: String>; " +
-                    "to get file type <2: Int> <path: String>; to stop the program type -1.");
-            int query = sc.nextInt();
-            if (query == 1){
-                ftpClient.list(sc.next());
+        while (true) {
+            System.out.println();
+            Scanner sc = new Scanner(System.in);
+            System.out.println("To list files type \"list <path of dir>\"; " +
+                    "to get file type \"get <path: String>\"; to stop the program type \"-1\".");
+            String query = sc.next();
+            if (query.equals("list")) {
+                String path = sc.next();
+                List<FTPFile> list = ftpClient.list(path);
+                if (list.size() == 0) {
+                    System.out.println("No files for such path");
+                    continue;
+                }
+                for (FTPFile ftpFile : list) {
+                    System.out.println("Name: \"" + ftpFile.getName() + "\", is dir: " + ftpFile.isDirectory());
+                }
+                continue;
             }
 
-            if (query == 2){
-                ftpClient.get(sc.next());
+            if (query.equals("get")) {
+                String path = sc.next();
+                if (ftpClient.get(path) != null) System.out.println("Done!");
+                else System.out.println("No file for such path");
+                continue;
             }
 
-            if (query == -1){
+            if (query.equals("-1")) {
                 break;
             }
+
+            System.out.println("Sorry, use the format:");
         }
 
         ftpClient.close();
