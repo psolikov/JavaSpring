@@ -50,7 +50,7 @@ public class FTPServerTest {
         assertEquals(list.size(), dis.readInt());
         for (FTPFile file : list) {
             assertEquals(file.getName(), dis.readUTF());
-            assertEquals(file.isDirectory(), dis.readBoolean());
+            assertEquals(file.getDir(), dis.readBoolean());
         }
         server.close();
     }
@@ -75,7 +75,7 @@ public class FTPServerTest {
         assertEquals(list.size(), in.readInt());
         for (FTPFile file : list) {
             assertEquals(file.getName(), in.readUTF());
-            assertEquals(file.isDirectory(), in.readBoolean());
+            assertEquals(file.getDir(), in.readBoolean());
         }
     }
 
