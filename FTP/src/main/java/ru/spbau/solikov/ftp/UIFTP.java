@@ -37,8 +37,8 @@ public class UIFTP extends Application {
         Button submit = new Button("Submit");
         submit.setOnAction(e -> {
             try {
-                client = new FTPClient(Integer.parseInt(address.getText()),
-                        port.getText());
+                client = new FTPClient(Integer.parseInt(port.getText()),
+                        address.getText());
                 setUpApp(primaryStage);
             } catch (NumberFormatException n) {
                 showAlert("Bad format. Try again.");
