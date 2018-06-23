@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.System.exit;
-import static java.lang.System.in;
 
 /**
  * A client part of FTP communication. Provides listing and downloading from the server.
@@ -25,16 +24,16 @@ public class FTPClient {
      * @param port    that server is using for monitoring
      * @param address of the server
      */
-    public FTPClient(int port, String address) {
-        try {
+    public FTPClient(int port, String address) throws IOException {
+//        try {
             socket = new Socket(address, port);
             dataInputStream = new DataInputStream(socket.getInputStream());
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            System.out.print("Can't establish connection. Try again.");
-            e.printStackTrace();
-            exit(1);
-        }
+//        } catch (IOException e) {
+//            System.out.print("Can't establish connection. Try again.");
+//            e.printStackTrace();
+//            exit(1);
+//        }
     }
 
     /**
@@ -162,7 +161,7 @@ public class FTPClient {
                     continue;
                 }
                 for (FTPFile ftpFile : list) {
-                    System.out.println("Name: \"" + ftpFile.getName() + "\", is dir: " + ftpFile.isDirectory());
+                    System.out.println("Name: \"" + ftpFile.getName() + "\", is dir: " + ftpFile.getDir());
                 }
                 continue;
             }

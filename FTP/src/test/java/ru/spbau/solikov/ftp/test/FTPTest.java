@@ -33,7 +33,7 @@ public class FTPTest {
     }
 
     @Before
-    public void setUp2(){
+    public void setUp2() throws IOException {
         client = new FTPClient(4444, "localhost");
     }
 
@@ -55,7 +55,7 @@ public class FTPTest {
         boolean[] expected2 = new boolean[]{false, false, false, true};
         answer.sort(Comparator.comparing(FTPFile::getName));
         for (int i = 0; i < answer.size(); i++) {
-            assertEquals(answer.get(i).isDirectory(), expected2[i]);
+            assertEquals(answer.get(i).getDir(), expected2[i]);
             assertEquals(answer.get(i).getName(), expected[i]);
         }
     }*/

@@ -10,9 +10,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -38,7 +36,7 @@ public class FTPClientTest {
         out.writeInt(ftpFiles.size());
         for (FTPFile file : ftpFiles) {
             out.writeUTF(file.getName());
-            out.writeBoolean(file.isDirectory());
+            out.writeBoolean(file.getDir());
         }
         when(clientSocket.getOutputStream()).thenReturn(answer);
         when(clientSocket.getInputStream()).thenReturn(new ByteArrayInputStream(baos.toByteArray()));
@@ -49,7 +47,7 @@ public class FTPClientTest {
         assertEquals(ftpFiles.size(), list.size());
         for (int i = 0; i < ftpFiles.size(); i++){
             assertEquals(ftpFiles.get(i).getName(), list.get(i).getName());
-            assertEquals(ftpFiles.get(i).isDirectory(), list.get(i).isDirectory());
+            assertEquals(ftpFiles.get(i).getDir(), list.get(i).getDir());
         }
     }
 
